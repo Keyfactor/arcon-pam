@@ -9,7 +9,18 @@ using Microsoft.Extensions.Logging;
 
 namespace arcon_pam.Clients;
 
-public class ArconClient
+public interface IArconClient
+{
+    /// <summary>
+    /// Gets a device passkey from Arcon for the specified request. This method will first retrieve an access token from Arcon, and then use that token to make a request to the Arcon API to get the device passkey.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    /// <exception cref="ArconException">Thrown when authentication to Arcon is unsuccessful, or if the returned entry is missing or has no password data</exception>
+    Task<GetTargetDevicePasskeyResponseItem> GetDevicePasskey(GetTargetDevicePasskeyRequestItem request);
+}
+
+public class ArconClient : IArconClient
 {
     private readonly ILogger _logger;
     private readonly HttpClient _httpClient;
@@ -21,19 +32,19 @@ public class ArconClient
         PropertyNameCaseInsensitive = true,
     };
     
-    public ArconClient(ILogger logger, string host, string username, string password)
+    public ArconClient(ILoggerFactory logger, string host, string username, string password)
         : this(logger, CreateHttpClient(host), username, password)
     {
     }
 
-    public ArconClient(ILogger logger, HttpClient httpClient, string username, string password)
+    public ArconClient(ILoggerFactory logger, HttpClient httpClient, string username, string password)
     {
-        _logger = logger;
+        _logger = logger.CreateLogger<ArconClient>();
         _httpClient = httpClient;
         _username = username;
         _password = password;
         
-        _logger.LogTrace("Successfully instantiated Arcon Client");
+        _logger.LogTrace($"Successfully instantiated Arcon Client. Username: {username}, Host: {httpClient.BaseAddress}");
     }
 
     private static HttpClient CreateHttpClient(string host)

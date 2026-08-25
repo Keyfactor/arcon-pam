@@ -17,13 +17,13 @@ public class ArconClientTests
         serviceCollection.AddLogging(builder =>
         {
             builder.AddProvider(new XUnitLoggerProvider(output, new XUnitLoggerOptions()));
-            builder.SetMinimumLevel(LogLevel.Debug);
+            builder.SetMinimumLevel(LogLevel.Trace);
         });
         ServiceProvider provider = serviceCollection.BuildServiceProvider();
-        _logger = provider.GetRequiredService<ILogger<ArconClientTests>>();
+        _loggerFactory = provider.GetRequiredService<ILoggerFactory>();
     }
 
-    private readonly ILogger _logger;
+    private readonly ILoggerFactory _loggerFactory;
     
     private const string Host = "arcon.example.com";
     private const string GetTokenEndpoint = "/DV/api/sdk/gettoken";
@@ -99,6 +99,21 @@ public class ArconClientTests
             ]
         }
         """;
+    
+    private const string GetDevicePasskeyObjectNoResultData = """
+        {
+            "Program": "Arcon Micro Service API",
+            "Version": "1.0.0.0",
+            "StatusCode": 200,
+            "Message": "Success",
+            "Ticks": "13.7802",
+            "ResultCount": "1",
+            "AppMessage": "",
+            "AppMessageCode": null,
+            "Success": true,
+            "Result": []
+        }
+        """;
 
     private const string GetDevicePasskeyObjectNotFoundResponse = """
         {
@@ -131,7 +146,7 @@ public class ArconClientTests
         {
             BaseAddress = new Uri($"https://{Host}"),
         };
-        return new ArconClient(_logger, httpClient, "username", "password");
+        return new ArconClient(_loggerFactory, httpClient, "username", "password");
     }
 
     private static GetTargetDevicePasskeyRequestItem CreateRequest() => new()
@@ -176,9 +191,25 @@ public class ArconClientTests
         Assert.Contains("Failed to retrieve access token from Arcon: Invalid Credential", exception.Message);
         Assert.Equal(0, mockHttp.GetMatchCount(passkeyRequest));
     }
+    
+    [Fact]
+    public async Task GetDevicePasskey_NoResultFound_ThrowsException()
+    {
+        var mockHttp = new MockHttpMessageHandler();
+        mockHttp.When(HttpMethod.Post, GetTokenEndpoint)
+            .Respond("application/json", GetTokenSuccessResponse);
+        mockHttp.When(HttpMethod.Get, GetPasskeyEndpoint)
+            .Respond("application/json", GetDevicePasskeyObjectNoResultData);
+
+        ArconClient client = CreateClient(mockHttp);
+
+        ArconException exception = await Assert.ThrowsAsync<ArconException>(() => client.GetDevicePasskey(CreateRequest()));
+
+        Assert.Contains("Arcon returned an empty response for the requested device passkey.", exception.Message);
+    }
 
     [Fact]
-    public async Task GetDevicePasskey_ObjectNotFound_CurrentlyReturnsPassthroughResultInsteadOfThrowing()
+    public async Task GetDevicePasskey_ObjectNotFound_ThrowsException()
     {
         var mockHttp = new MockHttpMessageHandler();
         mockHttp.When(HttpMethod.Post, GetTokenEndpoint)
