@@ -1,0 +1,19 @@
+{
+  "$schema": "https://keyfactor.github.io/integration-manifest-schema.json",
+  "integration_type": "pam",
+  "name": "PAM Integration Template",
+  "status": "prototype",
+  "description": "This project is meant to be a template to quickly build a basic integration product build. Currently in dev, a work in progress,",
+  "support_level": "kf-community",
+  "link_github": false,
+  "update_catalog": false,
+  "release_dir": "UPDATE-THIS-WITH-PATH-TO-BINARY-BUILD-FOLDER",
+  "about": {
+    "pam": {
+      "assemblyName": "changeme.assemblyName",
+      "fullyQualifiedClassName": "changeme.fullyQualifiedClassName",
+      "dbName": "changeme.dbName"
+    }
+  }
+}
+
