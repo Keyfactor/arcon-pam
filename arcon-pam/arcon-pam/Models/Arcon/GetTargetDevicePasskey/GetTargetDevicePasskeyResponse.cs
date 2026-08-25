@@ -8,7 +8,9 @@ public sealed class GetTargetDevicePasskeyResponseItem
 {
     public string ServerIp { get; set; }
     public string UserName { get; set; }
-    public string Password { get; set; }
-    public string AliasName { get; set; }
+    public string? Password { get; set; }
+    public string? PassKey { get; set; }
+    public string? AliasName { get; set; }
+    public bool Status { get; set; }
     public string Message { get; set; }
 }
