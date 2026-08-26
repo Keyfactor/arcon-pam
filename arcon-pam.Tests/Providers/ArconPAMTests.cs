@@ -141,7 +141,7 @@ public sealed class ArconPAMTests(ITestOutputHelper output) : BaseTestFixture(ou
             .WithPartialContent(apiUsername)
             .WithPartialContent(apiPassword)
             .Respond("application/json", GetTokenSuccessResponse);
-        mockHttp.When(HttpMethod.Get, $"{host}{GetPasskeyEndpoint}")
+        mockHttp.When(HttpMethod.Post, $"{host}{GetPasskeyEndpoint}")
             .WithHeaders("Authorization", "bearer token")
             .WithPartialContent(assetUsername)
             .WithPartialContent(assetAlias)
@@ -185,7 +185,7 @@ public sealed class ArconPAMTests(ITestOutputHelper output) : BaseTestFixture(ou
         var mockHttp = new MockHttpMessageHandler();
         mockHttp.When(HttpMethod.Post, $"{host}{GetTokenEndpoint}")
             .Respond("application/json", GetTokenSuccessResponse);
-        mockHttp.When(HttpMethod.Get, $"{host}{GetPasskeyEndpoint}")
+        mockHttp.When(HttpMethod.Post, $"{host}{GetPasskeyEndpoint}")
             .Respond("application/json", GetDevicePasskeyNoResultsResponse);
 
         ArconPAM sut = CreateSut(mockHttp);
@@ -205,7 +205,7 @@ public sealed class ArconPAMTests(ITestOutputHelper output) : BaseTestFixture(ou
         var mockHttp = new MockHttpMessageHandler();
         mockHttp.When(HttpMethod.Post, $"{host}{GetTokenEndpoint}")
             .Respond("application/json", GetTokenSuccessResponse);
-        mockHttp.When(HttpMethod.Get, $"{host}{GetPasskeyEndpoint}")
+        mockHttp.When(HttpMethod.Post, $"{host}{GetPasskeyEndpoint}")
             .Respond("application/json", GetDevicePasskeyObjectNotFoundResponse);
 
         ArconPAM sut = CreateSut(mockHttp);

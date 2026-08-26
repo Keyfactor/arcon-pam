@@ -56,7 +56,7 @@ public class ArconClient
         GetTokenResponseData token = await GetAccessToken();
 
         string endpoint = "/DV/api/sdk/gettargetdevicepasskey";
-        GetTargetDevicePasskeyResponse response = await Send<GetTargetDevicePasskeyResponse>(HttpMethod.Get, endpoint, new [] {request}, token);
+        GetTargetDevicePasskeyResponse response = await Send<GetTargetDevicePasskeyResponse>(HttpMethod.Post, endpoint, new [] {request}, token);
 
         if (!response.Result.Any())
         {
