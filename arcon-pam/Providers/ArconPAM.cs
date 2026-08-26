@@ -7,7 +7,7 @@ using Keyfactor.Logging;
 using Keyfactor.Platform.Extensions;
 using Microsoft.Extensions.Logging;
 
-namespace arcon_pam.Providers;
+namespace Keyfactor.Extensions.Pam.Arcon.Providers;
 
 public class ArconPAM : IPAMProvider
 {

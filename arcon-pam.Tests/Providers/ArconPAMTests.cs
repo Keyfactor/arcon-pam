@@ -1,6 +1,6 @@
 using arcon_pam.Exceptions;
 using arcon_pam.Models;
-using arcon_pam.Providers;
+using Keyfactor.Extensions.Pam.Arcon.Providers;
 using RichardSzalay.MockHttp;
 using Xunit.Abstractions;
 
