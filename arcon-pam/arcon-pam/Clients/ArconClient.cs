@@ -9,18 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace arcon_pam.Clients;
 
-public interface IArconClient
-{
-    /// <summary>
-    /// Gets a device passkey from Arcon for the specified request. This method will first retrieve an access token from Arcon, and then use that token to make a request to the Arcon API to get the device passkey.
-    /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
-    /// <exception cref="ArconException">Thrown when authentication to Arcon is unsuccessful, or if the returned entry is missing or has no password data</exception>
-    Task<GetTargetDevicePasskeyResponseItem> GetDevicePasskey(GetTargetDevicePasskeyRequestItem request);
-}
-
-public class ArconClient : IArconClient
+public class ArconClient
 {
     private readonly ILogger _logger;
     private readonly HttpClient _httpClient;
@@ -47,16 +36,20 @@ public class ArconClient : IArconClient
         _logger.LogTrace($"Successfully instantiated Arcon Client. Username: {username}, Host: {httpClient.BaseAddress}");
     }
 
-    private static HttpClient CreateHttpClient(string host)
+    internal static HttpClient CreateHttpClient(string host, HttpMessageHandler? handler = null)
     {
-        var httpClient = new HttpClient
-        {
-            BaseAddress = new Uri($"https://{host}"),
-        };
+        HttpClient httpClient = handler is null ? new HttpClient() : new HttpClient(handler);
+        httpClient.BaseAddress = new Uri($"https://{host}");
         httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         return httpClient;
     }
-    
+
+    /// <summary>
+    /// Gets a device passkey from Arcon for the specified request. This method will first retrieve an access token from Arcon, and then use that token to make a request to the Arcon API to get the device passkey.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    /// <exception cref="ArconException">Thrown when authentication to Arcon is unsuccessful, or if the returned entry is missing or has no password data</exception>
     public async Task<GetTargetDevicePasskeyResponseItem> GetDevicePasskey(GetTargetDevicePasskeyRequestItem request)
     {
         _logger.LogDebug($"Getting device passkey. Request data: {JsonSerializer.Serialize(request, Options)}");

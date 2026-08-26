@@ -12,20 +12,21 @@ namespace arcon_pam.Providers;
 public class ArconPAM : IPAMProvider
 {
     private readonly ILogger _logger;
-    private readonly IArconClientFactory _clientFactory;
-    
+    private readonly ILoggerFactory _loggerFactory;
+    private readonly HttpMessageHandler? _httpMessageHandler;
+
     public ArconPAM()
+        : this(new KeyfactorLoggerFactory())
     {
-        _logger = LogHandler.GetClassLogger<ArconPAM>();
-        _clientFactory = new ArconClientFactory(new KeyfactorLoggerFactory());
     }
 
-    public ArconPAM(IArconClientFactory factory, ILoggerFactory logger)
+    public ArconPAM(ILoggerFactory loggerFactory, HttpMessageHandler? httpMessageHandler = null)
     {
-        _logger = logger.CreateLogger<ArconPAM>();
-        _clientFactory = factory;
+        _logger = loggerFactory.CreateLogger<ArconPAM>();
+        _loggerFactory = loggerFactory;
+        _httpMessageHandler = httpMessageHandler;
     }
-    
+
     public string Name => "Arcon";
     
     public string GetPassword(Dictionary<string, string> instanceParameters, Dictionary<string, string> initializationInfo)
@@ -52,7 +53,8 @@ public class ArconPAM : IPAMProvider
 
         try
         {
-            IArconClient client = _clientFactory.Create(apiHost, apiUsername, apiPassword);
+            HttpClient httpClient = ArconClient.CreateHttpClient(apiHost, _httpMessageHandler);
+            ArconClient client = new ArconClient(_loggerFactory, httpClient, apiUsername, apiPassword);
 
             GetTargetDevicePasskeyResponseItem item = client.GetDevicePasskey(new GetTargetDevicePasskeyRequestItem()
             {
