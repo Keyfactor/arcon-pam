@@ -1,6 +1,7 @@
+using arcon_pam.Clients;
 using Microsoft.Extensions.Logging;
 
-namespace arcon_pam.Clients;
+namespace arcon_pam.Factories;
 
 public interface IArconClientFactory
 {
@@ -22,7 +23,7 @@ public class ArconClientFactory : IArconClientFactory
     {
         _logger.LogTrace($"Creating ArconClient");
         
-        IArconClient client = new ArconClientBase(_loggerFactory, host, username, password);
+        IArconClient client = new ArconClient(_loggerFactory, host, username, password);
         
         _logger.LogTrace("Successfully created ArconClient");
         

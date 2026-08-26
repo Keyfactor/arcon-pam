@@ -20,7 +20,7 @@ public interface IArconClient
     Task<GetTargetDevicePasskeyResponseItem> GetDevicePasskey(GetTargetDevicePasskeyRequestItem request);
 }
 
-public class ArconClientBase : IArconClient
+public class ArconClient : IArconClient
 {
     private readonly ILogger _logger;
     private readonly HttpClient _httpClient;
@@ -32,14 +32,14 @@ public class ArconClientBase : IArconClient
         PropertyNameCaseInsensitive = true,
     };
     
-    public ArconClientBase(ILoggerFactory logger, string host, string username, string password)
+    public ArconClient(ILoggerFactory logger, string host, string username, string password)
         : this(logger, CreateHttpClient(host), username, password)
     {
     }
 
-    public ArconClientBase(ILoggerFactory logger, HttpClient httpClient, string username, string password)
+    public ArconClient(ILoggerFactory logger, HttpClient httpClient, string username, string password)
     {
-        _logger = logger.CreateLogger<ArconClientBase>();
+        _logger = logger.CreateLogger<ArconClient>();
         _httpClient = httpClient;
         _username = username;
         _password = password;
