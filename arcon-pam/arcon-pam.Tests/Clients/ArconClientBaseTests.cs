@@ -1,30 +1,13 @@
 using arcon_pam.Clients;
 using arcon_pam.Exceptions;
 using arcon_pam.Models.Arcon.GetTargetDevicePasskey;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using RichardSzalay.MockHttp;
-using MartinCostello.Logging.XUnit;
 using Xunit.Abstractions;
 
 namespace arcon_pam.Tests.Clients;
 
-public class ArconClientTests
+public class ArconClientBaseTests(ITestOutputHelper output) : BaseTestFixture(output)
 {
-    public ArconClientTests(ITestOutputHelper output)
-    {
-        var serviceCollection = new ServiceCollection();
-        serviceCollection.AddLogging(builder =>
-        {
-            builder.AddProvider(new XUnitLoggerProvider(output, new XUnitLoggerOptions()));
-            builder.SetMinimumLevel(LogLevel.Trace);
-        });
-        ServiceProvider provider = serviceCollection.BuildServiceProvider();
-        _loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-    }
-
-    private readonly ILoggerFactory _loggerFactory;
-    
     private const string Host = "arcon.example.com";
     private const string GetTokenEndpoint = "/DV/api/sdk/gettoken";
     private const string GetPasskeyEndpoint = "/DV/api/sdk/gettargetdevicepasskey";
@@ -140,13 +123,13 @@ public class ArconClientTests
         }
         """;
 
-    private ArconClient CreateClient(MockHttpMessageHandler mockHttp)
+    private ArconClientBase CreateClient(MockHttpMessageHandler mockHttp)
     {
         var httpClient = new HttpClient(mockHttp)
         {
             BaseAddress = new Uri($"https://{Host}"),
         };
-        return new ArconClient(_loggerFactory, httpClient, "username", "password");
+        return new ArconClientBase(LoggerFactory, httpClient, "username", "password");
     }
 
     private static GetTargetDevicePasskeyRequestItem CreateRequest() => new()
@@ -166,9 +149,9 @@ public class ArconClientTests
             .WithHeaders("Authorization", "bearer token")
             .Respond("application/json", GetDevicePasskeySuccessResponse);
 
-        ArconClient client = CreateClient(mockHttp);
+        ArconClientBase clientBase = CreateClient(mockHttp);
 
-        GetTargetDevicePasskeyResponseItem result = await client.GetDevicePasskey(CreateRequest());
+        GetTargetDevicePasskeyResponseItem result = await clientBase.GetDevicePasskey(CreateRequest());
 
         Assert.Equal("10.10.2.138", result.ServerIp);
         Assert.Equal("mypassword", result.Password);
@@ -184,9 +167,9 @@ public class ArconClientTests
         MockedRequest passkeyRequest = mockHttp.When(HttpMethod.Get, GetPasskeyEndpoint)
             .Respond("application/json", GetDevicePasskeySuccessResponse);
 
-        ArconClient client = CreateClient(mockHttp);
+        ArconClientBase clientBase = CreateClient(mockHttp);
 
-        ArconException exception = await Assert.ThrowsAsync<ArconException>(() => client.GetDevicePasskey(CreateRequest()));
+        ArconException exception = await Assert.ThrowsAsync<ArconException>(() => clientBase.GetDevicePasskey(CreateRequest()));
 
         Assert.Contains("Failed to retrieve access token from Arcon: Invalid Credential", exception.Message);
         Assert.Equal(0, mockHttp.GetMatchCount(passkeyRequest));
@@ -201,9 +184,9 @@ public class ArconClientTests
         mockHttp.When(HttpMethod.Get, GetPasskeyEndpoint)
             .Respond("application/json", GetDevicePasskeyObjectNoResultData);
 
-        ArconClient client = CreateClient(mockHttp);
+        ArconClientBase clientBase = CreateClient(mockHttp);
 
-        ArconException exception = await Assert.ThrowsAsync<ArconException>(() => client.GetDevicePasskey(CreateRequest()));
+        ArconException exception = await Assert.ThrowsAsync<ArconException>(() => clientBase.GetDevicePasskey(CreateRequest()));
 
         Assert.Contains("Arcon returned an empty response for the requested device passkey.", exception.Message);
     }
@@ -217,9 +200,9 @@ public class ArconClientTests
         mockHttp.When(HttpMethod.Get, GetPasskeyEndpoint)
             .Respond("application/json", GetDevicePasskeyObjectNotFoundResponse);
 
-        ArconClient client = CreateClient(mockHttp);
+        ArconClientBase clientBase = CreateClient(mockHttp);
 
-        ArconException exception = await Assert.ThrowsAsync<ArconException>(() => client.GetDevicePasskey(CreateRequest()));
+        ArconException exception = await Assert.ThrowsAsync<ArconException>(() => clientBase.GetDevicePasskey(CreateRequest()));
 
         Assert.Contains("No password data was found for the provided entry. Please double check that the entry exists in Arcon, and that the entry has password information. Arcon message: Requested vault details not found or disabled.", exception.Message);
     }

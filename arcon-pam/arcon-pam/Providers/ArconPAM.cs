@@ -1,4 +1,6 @@
 using arcon_pam.Clients;
+using arcon_pam.Exceptions;
+using arcon_pam.Models;
 using arcon_pam.Models.Arcon.GetTargetDevicePasskey;
 using Keyfactor.Logging;
 using Keyfactor.Platform.Extensions;
@@ -30,18 +32,61 @@ public class ArconPAM : IPAMProvider
     {
         _logger.MethodEntry();
 
-        IArconClient client = _clientFactory.Create("", "", ""); // TODO
-
-        GetTargetDevicePasskeyResponseItem item = client.GetDevicePasskey(new GetTargetDevicePasskeyRequestItem()
-        {
-            Username = "",
-            OpenForHours = 1,
-            AliasName = "",
-        }).GetAwaiter().GetResult(); // TODO
-
-        string password = item.Password!;
+        string apiHost = GetRequiredParameter(initializationInfo, Constants.InitializationInfo.ApiHost,
+            "initialization info");
+        string apiUsername = GetRequiredParameter(initializationInfo, Constants.InitializationInfo.ApiUsername,
+            "initialization info");
+        string apiPassword = GetRequiredParameter(initializationInfo, Constants.InitializationInfo.ApiPassword,
+            "initialization info");
         
-        _logger.LogInformation($"Successfully retrieved password from Arcon PAM");
-        return password;
+        _logger.LogDebug($"Initialization info parameters: {Constants.InitializationInfo.ApiHost}: {apiHost}, " +
+                         $"{Constants.InitializationInfo.ApiUsername}: {apiUsername}, {Constants.InitializationInfo.ApiPassword}: [redacted]");
+
+        string assetUsername = GetRequiredParameter(instanceParameters, Constants.InstanceParameters.AssetUsername,
+            "instance parameter");
+        string assetAlias = GetRequiredParameter(instanceParameters, Constants.InstanceParameters.AssetAlias, 
+            "instance parameter");
+        
+        _logger.LogDebug($"Instance parameters: {Constants.InstanceParameters.AssetUsername}: {assetUsername}, " +
+                         $"{Constants.InstanceParameters.AssetAlias}: {assetAlias}");
+
+        try
+        {
+            IArconClient client = _clientFactory.Create(apiHost, apiUsername, apiPassword);
+
+            GetTargetDevicePasskeyResponseItem item = client.GetDevicePasskey(new GetTargetDevicePasskeyRequestItem()
+            {
+                Username = assetUsername,
+                OpenForHours = 1,
+                AliasName = assetAlias,
+            }).GetAwaiter().GetResult(); // TODO
+
+            string password = item.Password!;
+
+            _logger.LogInformation($"Successfully retrieved password from Arcon PAM");
+            return password;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Error retrieving password from Arcon PAM: {ex.Message}\n{ex.StackTrace}");
+            throw;
+        }
+    }
+
+    private string GetRequiredParameter(Dictionary<string, string> dictionary, string key, string dictionaryDescription)
+    {
+        _logger.LogTrace($"Looking up {dictionaryDescription} parameter '{key}'");
+
+        bool exists = dictionary.TryGetValue(key, out string? value);
+        if (!exists || string.IsNullOrWhiteSpace(value))
+        {
+            string errorMessage = $"The {dictionaryDescription} parameter {key} is missing a value or not provided";
+            _logger.LogError(errorMessage);
+            throw new MissingParameterException(errorMessage);
+        }
+        
+        _logger.LogTrace($"Successfully retrieved {dictionaryDescription} parameter '{key}'");
+
+        return value;
     }
 }

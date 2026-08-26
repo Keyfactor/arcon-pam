@@ -22,7 +22,7 @@ public class ArconClientFactory : IArconClientFactory
     {
         _logger.LogTrace($"Creating ArconClient");
         
-        IArconClient client = new ArconClient(_loggerFactory, host, username, password);
+        IArconClient client = new ArconClientBase(_loggerFactory, host, username, password);
         
         _logger.LogTrace("Successfully created ArconClient");
         
