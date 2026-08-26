@@ -58,7 +58,7 @@ public class ArconClient
         string endpoint = "/DV/api/sdk/gettargetdevicepasskey";
         GetTargetDevicePasskeyResponse response = await Send<GetTargetDevicePasskeyResponse>(HttpMethod.Post, endpoint, new [] {request}, token);
 
-        if (!response.Result.Any())
+        if (response.Result is null || !response.Result.Any())
         {
             throw new ArconException("Arcon returned an empty response for the requested device passkey.");
         }
