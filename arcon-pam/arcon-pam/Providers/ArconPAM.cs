@@ -1,11 +1,11 @@
 using arcon_pam.Clients;
 using arcon_pam.Exceptions;
+using arcon_pam.Factories;
 using arcon_pam.Models;
 using arcon_pam.Models.Arcon.GetTargetDevicePasskey;
 using Keyfactor.Logging;
 using Keyfactor.Platform.Extensions;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace arcon_pam.Providers;
 
@@ -17,7 +17,7 @@ public class ArconPAM : IPAMProvider
     public ArconPAM()
     {
         _logger = LogHandler.GetClassLogger<ArconPAM>();
-        _clientFactory = new ArconClientFactory(new NullLoggerFactory()); // TODO: Scaffold a LoggerFactory?
+        _clientFactory = new ArconClientFactory(new KeyfactorLoggerFactory());
     }
 
     public ArconPAM(IArconClientFactory factory, ILoggerFactory logger)
@@ -68,7 +68,7 @@ public class ArconPAM : IPAMProvider
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Error retrieving password from Arcon PAM: {ex.Message}\n{ex.StackTrace}");
+            _logger.LogError(ex, $"Error retrieving password from Arcon PAM: {LogHandler.FlattenException(ex)}");
             throw;
         }
     }
