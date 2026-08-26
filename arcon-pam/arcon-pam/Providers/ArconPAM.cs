@@ -59,7 +59,7 @@ public class ArconPAM : IPAMProvider
                 Username = assetUsername,
                 OpenForHours = 1,
                 AliasName = assetAlias,
-            }).GetAwaiter().GetResult(); // TODO
+            }).GetAwaiter().GetResult();
 
             string password = item.Password!;
 
