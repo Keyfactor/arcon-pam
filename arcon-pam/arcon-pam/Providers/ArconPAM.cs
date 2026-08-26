@@ -54,16 +54,26 @@ public class ArconPAM : IPAMProvider
         try
         {
             HttpClient httpClient = ArconClient.CreateHttpClient(apiHost, _httpMessageHandler);
-            ArconClient client = new ArconClient(_loggerFactory, httpClient, apiUsername, apiPassword);
+            ArconClient client = new (_loggerFactory, httpClient, apiUsername, apiPassword);
 
-            GetTargetDevicePasskeyResponseItem item = client.GetDevicePasskey(new GetTargetDevicePasskeyRequestItem()
+            GetTargetDevicePasskeyRequestItem request = new GetTargetDevicePasskeyRequestItem
             {
                 Username = assetUsername,
                 OpenForHours = 1,
                 AliasName = assetAlias,
-            }).GetAwaiter().GetResult();
+            };
 
-            string password = item.Password!;
+            GetTargetDevicePasskeyResponseItem item = client.GetDevicePasskey(request)
+                .GetAwaiter().GetResult();
+
+            string? password = item.Password;
+            
+            if (password is null)
+            {
+                // Arcon may return an error message in the response data if the provided information was not found.
+                throw new ArconException(
+                    $"No password data was found for the provided entry (UserName: {request.Username}, AliasName: {request.AliasName}). Please double check that the entry exists in Arcon, and that the entry has password information. Arcon message: {item.Message}");
+            }
 
             _logger.LogInformation($"Successfully retrieved password from Arcon PAM");
             return password;

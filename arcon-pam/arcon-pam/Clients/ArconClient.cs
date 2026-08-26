@@ -64,13 +64,6 @@ public class ArconClient
         }
 
         GetTargetDevicePasskeyResponseItem data = response.Result.First();
-
-        if (data.Password is null)
-        {
-            // Arcon may return an error message in the response data if the provided information was not found.
-            throw new ArconException(
-                $"No password data was found for the provided entry. Please double check that the entry exists in Arcon, and that the entry has password information. Arcon message: {data.Message}");
-        }
         
         _logger.LogDebug("Successfully retrieved device passkey from Arcon");
 
