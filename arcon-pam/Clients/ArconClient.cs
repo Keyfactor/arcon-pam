@@ -111,7 +111,7 @@ public class ArconClient
     private async Task<string> SendCore(HttpMethod method, string endpoint, object? payload = null, GetTokenResponseData? token = null)
     {
         _logger.LogTrace($"Creating an HTTP request for {method} {endpoint}");
-        var request = new HttpRequestMessage(method, endpoint);
+        using HttpRequestMessage request = new HttpRequestMessage(method, endpoint);
 
         if (token is not null)
         {
@@ -126,11 +126,17 @@ public class ArconClient
         
         _logger.LogTrace($"Sending a {request.Method} request to Arcon to the endpoint {request.RequestUri}");
 
-        HttpResponseMessage response = await _httpClient.SendAsync(request);
+        using HttpResponseMessage response = await _httpClient.SendAsync(request);
         
         _logger.LogDebug($"Endpoint {request.Method} {request.RequestUri} returned the HTTP status code {response.StatusCode}");
 
         string responseString = await response.Content.ReadAsStringAsync();
+        
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new ArconException($"Arcon request {method} {endpoint} failed with HTTP {(int)response.StatusCode} ({response.ReasonPhrase}). Response: {responseString}");
+        }
+        
         return responseString;
     }
 }

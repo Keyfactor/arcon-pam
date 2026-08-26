@@ -53,7 +53,7 @@ public class ArconPAM : IPAMProvider
 
         try
         {
-            HttpClient httpClient = ArconClient.CreateHttpClient(apiHost, _httpMessageHandler);
+            using HttpClient httpClient = ArconClient.CreateHttpClient(apiHost, _httpMessageHandler);
             ArconClient client = new (_loggerFactory, httpClient, apiUsername, apiPassword);
 
             GetTargetDevicePasskeyRequestItem request = new ()

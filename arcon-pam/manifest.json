@@ -8,8 +8,8 @@
     }
   },
   "Keyfactor:PAMProviders:Arcon:InitializationInfo": {
-    "ApiHost": "https://partnerci.arconnet.com",
-    "ApiUsername": "username",
-    "ApiPassword": "password"
+    "ApiHost": "<ApiHost>",
+    "ApiUsername": "<ApiUsername>",
+    "ApiPassword": "<ApiPassword>"
   }
 }

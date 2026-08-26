@@ -164,7 +164,7 @@ public sealed class ArconPAMTests(ITestOutputHelper output) : BaseTestFixture(ou
         var mockHttp = new MockHttpMessageHandler();
         mockHttp.When(HttpMethod.Post, $"{host}{GetTokenEndpoint}")
             .Respond("application/json", GetTokenInvalidCredentialsResponse);
-        MockedRequest passkeyRequest = mockHttp.When(HttpMethod.Get, $"{host}{GetPasskeyEndpoint}")
+        MockedRequest passkeyRequest = mockHttp.When(HttpMethod.Post, $"{host}{GetPasskeyEndpoint}")
             .Respond("application/json", GetDevicePasskeySuccessResponse);
 
         ArconPAM sut = CreateSut(mockHttp);
