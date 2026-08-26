@@ -1,0 +1,15 @@
+{
+  "extensions": {
+    "Keyfactor.Platform.Extensions.IPAMProvider": {
+      "PAMProviders.Arcon.PAMProvider": {
+        "assemblyPath": "arcon-pam.dll",
+        "TypeFullName": "Keyfactor.Extensions.Pam.Arcon.Providers.ArconPAM"
+      }
+    }
+  },
+  "Keyfactor:PAMProviders:Arcon:InitializationInfo": {
+    "ApiHost": "https://partnerci.arconnet.com",
+    "ApiUsername": "username",
+    "ApiPassword": "password"
+  }
+}
