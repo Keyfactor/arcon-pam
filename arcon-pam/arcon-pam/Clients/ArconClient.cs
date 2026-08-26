@@ -39,7 +39,7 @@ public class ArconClient
     internal static HttpClient CreateHttpClient(string host, HttpMessageHandler? handler = null)
     {
         HttpClient httpClient = handler is null ? new HttpClient() : new HttpClient(handler);
-        httpClient.BaseAddress = new Uri($"https://{host}");
+        httpClient.BaseAddress = new Uri(host);
         httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         return httpClient;
     }
