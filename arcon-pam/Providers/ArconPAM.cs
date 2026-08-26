@@ -56,7 +56,7 @@ public class ArconPAM : IPAMProvider
             HttpClient httpClient = ArconClient.CreateHttpClient(apiHost, _httpMessageHandler);
             ArconClient client = new (_loggerFactory, httpClient, apiUsername, apiPassword);
 
-            GetTargetDevicePasskeyRequestItem request = new GetTargetDevicePasskeyRequestItem
+            GetTargetDevicePasskeyRequestItem request = new ()
             {
                 Username = assetUsername,
                 OpenForHours = 1,
@@ -89,8 +89,8 @@ public class ArconPAM : IPAMProvider
     {
         _logger.LogTrace($"Looking up {dictionaryDescription} parameter '{key}'");
 
-        bool exists = dictionary.TryGetValue(key, out string? value);
-        if (!exists || string.IsNullOrWhiteSpace(value))
+        dictionary.TryGetValue(key, out string? value);
+        if (string.IsNullOrWhiteSpace(value))
         {
             string errorMessage = $"The {dictionaryDescription} parameter {key} is missing a value or not provided";
             _logger.LogError(errorMessage);

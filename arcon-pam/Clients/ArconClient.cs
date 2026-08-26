@@ -49,7 +49,7 @@ public class ArconClient
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    /// <exception cref="ArconException">Thrown when authentication to Arcon is unsuccessful, or if the returned entry is missing or has no password data</exception>
+    /// <exception cref="ArconException">Thrown when authentication to Arcon is unsuccessful, or if Arcon returns no result data</exception>
     public async Task<GetTargetDevicePasskeyResponseItem> GetDevicePasskey(GetTargetDevicePasskeyRequestItem request)
     {
         _logger.LogDebug($"Getting device passkey. Request data: {JsonSerializer.Serialize(request, Options)}");
