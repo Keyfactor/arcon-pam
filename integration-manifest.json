@@ -8,7 +8,7 @@
   "link_github": true,
   "update_catalog": true,
   "release_dir": "arcon-pam/bin/Release",
-  "release-project": "arcon-pam/arcon-pam.csproj",
+  "release_project": "arcon-pam/arcon-pam.csproj",
   "about": {
     "pam": {
       "assemblyName": "arcon-pam",
