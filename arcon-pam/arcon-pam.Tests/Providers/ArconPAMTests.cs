@@ -1,5 +1,6 @@
 using arcon_pam.Clients;
 using arcon_pam.Exceptions;
+using arcon_pam.Models;
 using arcon_pam.Models.Arcon.GetTargetDevicePasskey;
 using arcon_pam.Providers;
 using Moq;
@@ -30,9 +31,9 @@ public sealed class ArconPAMTests : BaseTestFixture
         Dictionary<string, string> initializationInfo = GetInitializationInfo();
         Dictionary<string, string> instanceParameters = GetInstanceParameters();
 
-        string host = initializationInfo["ApiHost"];
-        string username = initializationInfo["ApiUsername"];
-        string password = initializationInfo["ApiPassword"];
+        string host = initializationInfo[Constants.InitializationInfo.ApiHost];
+        string username = initializationInfo[Constants.InitializationInfo.ApiUsername];
+        string password = initializationInfo[Constants.InitializationInfo.ApiPassword];
         
         _sut.GetPassword(instanceParameters, initializationInfo);
         
@@ -47,8 +48,8 @@ public sealed class ArconPAMTests : BaseTestFixture
         Dictionary<string, string> initializationInfo = GetInitializationInfo();
         Dictionary<string, string> instanceParameters = GetInstanceParameters();
 
-        string assetUsername = instanceParameters["AssetUsername"];
-        string assetAlias = instanceParameters["AssetAlias"];
+        string assetUsername = instanceParameters[Constants.InstanceParameters.AssetUsername];
+        string assetAlias = instanceParameters[Constants.InstanceParameters.AssetAlias];
         
         _sut.GetPassword(instanceParameters, initializationInfo);
         
@@ -84,9 +85,9 @@ public sealed class ArconPAMTests : BaseTestFixture
     }
     
     [Theory]
-    [InlineData("ApiHost")]
-    [InlineData("ApiUsername")]
-    [InlineData("ApiPassword")]
+    [InlineData(Constants.InitializationInfo.ApiHost)]
+    [InlineData(Constants.InitializationInfo.ApiUsername)]
+    [InlineData(Constants.InitializationInfo.ApiPassword)]
     public void GetPassword_WhenInitializationInfoIsMissingRequiredParameters_ThrowsException(string keyToRemove)
     {
         SetupHappyPath();
@@ -101,9 +102,9 @@ public sealed class ArconPAMTests : BaseTestFixture
     }
     
     [Theory]
-    [InlineData("ApiHost")]
-    [InlineData("ApiUsername")]
-    [InlineData("ApiPassword")]
+    [InlineData(Constants.InitializationInfo.ApiHost)]
+    [InlineData(Constants.InitializationInfo.ApiUsername)]
+    [InlineData(Constants.InitializationInfo.ApiPassword)]
     public void GetPassword_WhenInitializationInfoParameterIsEmpty_ThrowsException(string keyToMakeEmpty)
     {
         SetupHappyPath();
@@ -118,8 +119,8 @@ public sealed class ArconPAMTests : BaseTestFixture
     }
     
     [Theory]
-    [InlineData("AssetUsername")]
-    [InlineData("AssetAlias")]
+    [InlineData(Constants.InstanceParameters.AssetUsername)]
+    [InlineData(Constants.InstanceParameters.AssetAlias)]
     public void GetPassword_WhenInstanceParametersIsMissingRequiredParameters_ThrowsException(string keyToRemove)
     {
         SetupHappyPath();
@@ -134,8 +135,8 @@ public sealed class ArconPAMTests : BaseTestFixture
     }
     
     [Theory]
-    [InlineData("AssetUsername")]
-    [InlineData("AssetAlias")]
+    [InlineData(Constants.InstanceParameters.AssetUsername)]
+    [InlineData(Constants.InstanceParameters.AssetAlias)]
     public void GetPassword_WhenInstanceParametersParameterIsEmpty_ThrowsException(string keyToMakeEmpty)
     {
         SetupHappyPath();
@@ -153,8 +154,8 @@ public sealed class ArconPAMTests : BaseTestFixture
     {
         return new Dictionary<string, string>()
         {
-            { "AssetUsername", "asset" },
-            { "AssetAlias", "alias" },
+            { Constants.InstanceParameters.AssetUsername, "asset" },
+            { Constants.InstanceParameters.AssetAlias, "alias" },
         };
     }
 
@@ -162,9 +163,9 @@ public sealed class ArconPAMTests : BaseTestFixture
     {
         return new Dictionary<string, string>()
         {
-            { "ApiHost", "host" },
-            { "ApiUsername", "user" },
-            { "ApiPassword", "pass" },
+            { Constants.InitializationInfo.ApiHost, "host" },
+            { Constants.InitializationInfo.ApiUsername, "user" },
+            { Constants.InitializationInfo.ApiPassword, "pass" },
         };
     }
 
