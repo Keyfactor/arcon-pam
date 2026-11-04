@@ -1,19 +1,61 @@
 {
-  "$schema": "https://keyfactor.github.io/integration-manifest-schema.json",
+  "$schema": "https://keyfactor.github.io/v2/integration-manifest-schema.json",
   "integration_type": "pam",
-  "name": "PAM Integration Template",
-  "status": "prototype",
-  "description": "This project is meant to be a template to quickly build a basic integration product build. Currently in dev, a work in progress,",
-  "support_level": "kf-community",
-  "link_github": false,
-  "update_catalog": false,
-  "release_dir": "UPDATE-THIS-WITH-PATH-TO-BINARY-BUILD-FOLDER",
+  "name": "Arcon PAM Provider",
+  "status": "production",
+  "description": "A Keyfactor PAM Provider plugin supporting credential retrieval from Arcon.",
+  "support_level": "kf-supported",
+  "link_github": true,
+  "update_catalog": true,
+  "release_dir": "arcon-pam/bin/Release",
+  "release_project": "arcon-pam/arcon-pam.csproj",
   "about": {
     "pam": {
-      "assemblyName": "changeme.assemblyName",
-      "fullyQualifiedClassName": "changeme.fullyQualifiedClassName",
-      "dbName": "changeme.dbName"
+      "assemblyName": "arcon-pam",
+      "fullyQualifiedClassName": "Keyfactor.Extensions.Pam.Arcon",
+      "dbName": "Arcon",
+      "pam_types": {
+        "Arcon": {
+          "Name": "Arcon",
+          "Parameters": [
+            {
+              "Name": "ApiHost",
+              "DisplayName": "API Host",
+              "DataType": 1,
+              "InstanceLevel": false,
+              "Description": "The host URL for the Arcon API, including the protocol (e.g., https://api.arcon.com)."
+            },
+            {
+              "Name": "ApiUsername",
+              "DisplayName": "API Username",
+              "DataType": 1,
+              "InstanceLevel": false,
+              "Description": "The username for the Arcon API."
+            },
+            {
+              "Name": "ApiPassword",
+              "DisplayName": "API Password",
+              "DataType": 2,
+              "InstanceLevel": false,
+              "Description": "The password for the Arcon API."
+            },
+            {
+              "Name": "AssetUsername",
+              "DisplayName": "Asset Username",
+              "DataType": 1,
+              "InstanceLevel": true,
+              "Description": "The username for the asset in the Arcon system. The integration will retrieve the password associated with the username and alias."
+            },
+            {
+              "Name": "AssetAlias",
+              "DisplayName": "Asset Alias",
+              "DataType": 1,
+              "InstanceLevel": true,
+              "Description": "The alias for the asset in the Arcon system. The integration will retrieve the password associated with the alias and username."
+            }
+          ]
+        }
+      }
     }
   }
 }
-
